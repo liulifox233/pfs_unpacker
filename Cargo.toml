@@ -1,0 +1,9 @@
+[package]
+name = "pfs_unpacker"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+clap = { version = "4.5.28", features = ["derive"] }
+rayon = "1.10.0"
+sha1 = "0.10.6"
