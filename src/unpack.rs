@@ -1,3 +1,7 @@
+use crate::ArtemisEntry;
+use crate::ArtemisHeader;
+use crate::ARCHIVE_MAGIC;
+use rayon::prelude::*;
 use sha1::{Digest, Sha1};
 use std::{
     fs::{self, File},
@@ -6,12 +10,6 @@ use std::{
     path::Path,
     str::from_utf8,
 };
-
-use crate::ArtemisEntry;
-use crate::ArtemisHeader;
-use crate::ARCHIVE_MAGIC;
-
-use rayon::prelude::*;
 
 pub fn unpack(path: String, output_dir: Option<String>) -> Result<(), Box<dyn std::error::Error>> {
     let mut file = File::open(path.clone())?;
