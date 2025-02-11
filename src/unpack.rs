@@ -13,8 +13,8 @@ use crate::ARCHIVE_MAGIC;
 
 use rayon::prelude::*;
 
-pub fn unpack(path: &str) -> Result<(), Box<dyn std::error::Error>> {
-    let mut file = File::open(path)?;
+pub fn unpack(path: String, output_dir: Option<String>) -> Result<(), Box<dyn std::error::Error>> {
+    let mut file = File::open(path.clone())?;
     let header = read_header(&mut file)?;
 
     let index_size = header.index_size;
@@ -32,8 +32,7 @@ pub fn unpack(path: &str) -> Result<(), Box<dyn std::error::Error>> {
     let entries = read_index(&mut file, &header)?;
 
     // Prepare output directory
-    let base_path = Path::new(path);
-    let output_dir = base_path.with_extension("");
+    let output_dir = Path::new(&output_dir.unwrap_or(path)).with_extension("");
     fs::create_dir_all(&output_dir)?;
 
     // Process files

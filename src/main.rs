@@ -15,7 +15,10 @@ struct Args {
 #[derive(Subcommand, Clone, Debug)]
 enum Command {
     /// Unpack an Artemis PFS archive
-    Unpack { path: String },
+    Unpack {
+        path: String,
+        output_dir: Option<String>,
+    },
     /// Pack a directory into an Artemis PFS archive
     Pack {
         #[clap(short, long)]
@@ -29,7 +32,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args = Args::parse();
 
     match args.command {
-        Command::Unpack { path } => unpack(&path).unwrap(),
+        Command::Unpack { path, output_dir } => unpack(path, output_dir).unwrap(),
         Command::Pack {
             input_dir,
             output_path,
