@@ -115,7 +115,7 @@ fn pack_v6(input_dir: &str, output_path: &str) {
         file.write_all(&entry.file_size.to_le_bytes()).unwrap(); // file size
     }
 
-    file.write_all(&(file_count as u32 + 1 as u32).to_le_bytes())
+    file.write_all(&(file_count as u32 + 1_u32).to_le_bytes())
         .unwrap();
 
     for entry in &artemis_entries {
