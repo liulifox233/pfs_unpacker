@@ -52,7 +52,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             input_dir,
             output_path,
             version,
-        } => pack::pack(&input_dir, &output_path, version).unwrap(),
+        } => pack::pack(&input_dir, &output_path, version),
     };
     Ok(())
 }
@@ -66,4 +66,53 @@ struct ArtemisHeader {
     pack_version: u8,
     index_size: u32,
     file_count: u32,
+}
+
+#[cfg(test)]
+mod test {
+    use assert_cmd::Command;
+    use std::fs;
+
+    #[test]
+    fn test_pack() -> Result<(), Box<dyn std::error::Error>> {
+        let mut cmd = Command::cargo_bin(env!("CARGO_PKG_NAME"))?;
+
+        cmd.arg("pack")
+            .arg("tests/test_pack")
+            .arg("/tmp/test_pack.pfs");
+        cmd.assert().success();
+
+        let expected = fs::read("tests/test_pack.pfs")?;
+        let packed = fs::read("/tmp/test_pack.pfs")?;
+
+        assert_eq!(expected, packed);
+
+        fs::remove_file("/tmp/test_pack.pfs")?;
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_unpack() -> Result<(), Box<dyn std::error::Error>> {
+        let mut cmd = Command::cargo_bin(env!("CARGO_PKG_NAME"))?;
+
+        cmd.arg("unpack")
+            .arg("tests/test_pack.pfs")
+            .arg("/tmp/test_pack");
+        cmd.assert().success();
+
+        let expected = fs::read_dir("tests/test_pack")?;
+        let unpacked = fs::read_dir("/tmp/test_pack")?;
+
+        for (expected, unpacked) in expected.zip(unpacked) {
+            let expected = expected?;
+            let unpacked = unpacked?;
+
+            assert_eq!(expected.file_name(), unpacked.file_name());
+        }
+
+        fs::remove_dir_all("/tmp/test_pack")?;
+
+        Ok(())
+    }
 }
