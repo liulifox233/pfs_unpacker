@@ -18,13 +18,11 @@ pub fn unpack(path: String, output_dir: Option<String>) -> Result<(), Box<dyn st
     let index_size = header.index_size;
     let file_count = header.file_count;
 
+    println!("successfully read header");
+    println!("magic: {:?}", std::str::from_utf8(&header.magic)?);
+    println!("pack_version: {}", header.pack_version as char);
     println!("index_size: {}", index_size);
     println!("file_count: {}", file_count);
-
-    // Validate archive magic
-    if header.magic != ARCHIVE_MAGIC {
-        return Err("Invalid Artemis PFS archive!".into());
-    }
 
     // Read index entries
     let entries = read_index(&mut file, &header)?;
@@ -40,14 +38,30 @@ pub fn unpack(path: String, output_dir: Option<String>) -> Result<(), Box<dyn st
 }
 
 fn read_header(file: &mut File) -> Result<ArtemisHeader, Box<dyn std::error::Error>> {
-    let mut buffer = [0u8; 11];
+    let mut buffer = [0u8; 7];
+    file.read_exact(&mut buffer)?;
+
+    let magic = [buffer[0], buffer[1]];
+
+    if magic != ARCHIVE_MAGIC {
+        return Err("Invalid Artemis PFS archive!".into());
+    }
+
+    let pack_version = buffer[2];
+    let index_size = u32::from_le_bytes([buffer[3], buffer[4], buffer[5], buffer[6]]);
+
+    if pack_version == b'2' {
+        file.seek(SeekFrom::Current(4))?;
+    }
+
+    let mut buffer = [0u8; 4];
     file.read_exact(&mut buffer)?;
 
     Ok(ArtemisHeader {
-        magic: [buffer[0], buffer[1]],
-        pack_version: buffer[2],
-        index_size: u32::from_le_bytes([buffer[3], buffer[4], buffer[5], buffer[6]]),
-        file_count: u32::from_le_bytes([buffer[7], buffer[8], buffer[9], buffer[10]]),
+        magic,
+        pack_version,
+        index_size,
+        file_count: u32::from_le_bytes(buffer),
     })
 }
 
@@ -66,8 +80,14 @@ fn read_index(
         file.read_exact(&mut path_buf)?;
         let path = from_utf8(&path_buf)?.to_string();
 
+        let reserved = match header.pack_version {
+            b'2' => 12,
+            b'8' => 4,
+            _ => 4,
+        };
+
         // Skip reserved field
-        file.seek(SeekFrom::Current(4))?;
+        file.seek(SeekFrom::Current(reserved))?;
 
         let mut offset_buf = [0u8; 4];
         file.read_exact(&mut offset_buf)?;
