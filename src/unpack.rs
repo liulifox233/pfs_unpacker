@@ -5,10 +5,15 @@ use sha1::{Digest, Sha1};
 use std::{
     fs::{self, File},
     io::{Read, Seek, SeekFrom, Write},
-    os::unix::fs::FileExt,
     path::Path,
     str::from_utf8,
 };
+
+#[cfg(target_os = "windows")]
+use std::os::windows::fs::FileExt;
+
+#[cfg(not(target_os = "windows"))]
+use std::os::unix::fs::FileExt;
 
 struct ArtemisEntry {
     path: String,
@@ -161,7 +166,7 @@ fn process_files(
             let entry_path = entry.path.replace("\\", "/");
 
             #[cfg(target_os = "windows")]
-            let entry_path = entry.path;
+            let entry_path = &entry.path;
 
             let entry_path = Path::new(&entry_path);
             let output_path = output_dir.join(entry_path);
@@ -172,7 +177,13 @@ fn process_files(
             }
 
             let mut buffer = vec![0u8; entry.size as usize];
+
+            #[cfg(not(target_os = "windows"))]
             file.read_exact_at(&mut buffer, entry.offset as u64)
+                .expect("Failed to read file data");
+
+            #[cfg(target_os = "windows")]
+            file.seek_read(&mut buffer, entry.offset as u64)
                 .expect("Failed to read file data");
 
             if header.pack_version == b'8' {
