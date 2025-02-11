@@ -33,11 +33,12 @@ enum Command {
     /// Pack a directory into an Artemis PFS archive
     Pack {
         /// Input directory
-        #[clap(short, long)]
         input_dir: String,
         /// Output path
-        #[clap(short, long)]
         output_path: String,
+        /// Pack version
+        #[clap(short, long)]
+        version: Option<u8>,
     },
 }
 
@@ -50,7 +51,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         Command::Pack {
             input_dir,
             output_path,
-        } => pack::pack(&input_dir, &output_path).unwrap(),
+            version,
+        } => pack::pack(&input_dir, &output_path, version).unwrap(),
     };
     Ok(())
 }
@@ -64,10 +66,4 @@ struct ArtemisHeader {
     pack_version: u8,
     index_size: u32,
     file_count: u32,
-}
-
-struct ArtemisEntry {
-    path: String,
-    offset: u32,
-    size: u32,
 }

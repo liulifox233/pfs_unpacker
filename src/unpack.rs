@@ -1,4 +1,3 @@
-use crate::ArtemisEntry;
 use crate::ArtemisHeader;
 use crate::ARCHIVE_MAGIC;
 use rayon::prelude::*;
@@ -10,6 +9,12 @@ use std::{
     path::Path,
     str::from_utf8,
 };
+
+struct ArtemisEntry {
+    path: String,
+    offset: u32,
+    size: u32,
+}
 
 pub fn get_info(path: String, verbose: bool) -> Result<(), Box<dyn std::error::Error>> {
     let mut file = File::open(path)?;
