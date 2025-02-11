@@ -2,6 +2,8 @@
 name = "pfs_unpacker"
 version = "1.0.0"
 edition = "2021"
+license = "GPL-3.0"
+license-file = "LICENSE"
 
 [dependencies]
 clap = { version = "4.5.28", features = ["derive"] }
