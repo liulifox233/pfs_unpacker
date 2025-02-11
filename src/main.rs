@@ -2,6 +2,7 @@ mod pack;
 mod unpack;
 
 use clap::{Parser, Subcommand};
+use unpack::get_info;
 
 use crate::unpack::unpack;
 
@@ -14,15 +15,27 @@ struct Args {
 
 #[derive(Subcommand, Clone, Debug)]
 enum Command {
+    /// Display information about an Artemis PFS archive
+    Info {
+        /// Path to the archive
+        path: String,
+        /// Display detailed information about the archive
+        #[clap(short, long)]
+        verbose: bool,
+    },
     /// Unpack an Artemis PFS archive
     Unpack {
+        /// Path to the archive
         path: String,
+        /// Output directory
         output_dir: Option<String>,
     },
     /// Pack a directory into an Artemis PFS archive
     Pack {
+        /// Input directory
         #[clap(short, long)]
         input_dir: String,
+        /// Output path
         #[clap(short, long)]
         output_path: String,
     },
@@ -32,6 +45,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args = Args::parse();
 
     match args.command {
+        Command::Info { path, verbose } => get_info(path, verbose).unwrap(),
         Command::Unpack { path, output_dir } => unpack(path, output_dir).unwrap(),
         Command::Pack {
             input_dir,

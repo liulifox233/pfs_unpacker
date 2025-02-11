@@ -11,6 +11,32 @@ use std::{
     str::from_utf8,
 };
 
+pub fn get_info(path: String, verbose: bool) -> Result<(), Box<dyn std::error::Error>> {
+    let mut file = File::open(path)?;
+    let header = read_header(&mut file)?;
+
+    let index_size = header.index_size;
+    let file_count = header.file_count;
+
+    println!("successfully read header");
+    println!("magic: {:?}", std::str::from_utf8(&header.magic)?);
+    println!("pack_version: {}", header.pack_version as char);
+    println!("index_size: {}", index_size);
+    println!("file_count: {}", file_count);
+
+    if verbose {
+        let entries = read_index(&mut file, &header)?;
+
+        for entry in entries {
+            print!("path: {} ", entry.path);
+            print!("offset: {} ", entry.offset);
+            println!("size: {}", entry.size);
+        }
+    }
+
+    Ok(())
+}
+
 pub fn unpack(path: String, output_dir: Option<String>) -> Result<(), Box<dyn std::error::Error>> {
     let mut file = File::open(path.clone())?;
     let header = read_header(&mut file)?;
