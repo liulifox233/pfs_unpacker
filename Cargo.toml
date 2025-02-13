@@ -3,6 +3,9 @@ name = "pfs_unpacker"
 version = "2.0.0"
 edition = "2021"
 license = "GPL-3.0"
+description = "Artemis Engine archive unpacker ( packer )"
+repository = "https://github.com/liulifox233/pfs_unpacker"
+documentation = "https://docs.rs/pfs_unpacker"
 
 [dependencies]
 clap = { version = "4.5.29", features = ["derive"] }
