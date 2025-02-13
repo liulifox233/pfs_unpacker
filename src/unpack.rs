@@ -149,7 +149,9 @@ fn process_files(
         let mut hasher = Sha1::new();
         let mut index_data = vec![0u8; header.index_size as usize];
         file.seek(SeekFrom::Start(
-            (size_of::<ArtemisHeader>() - 4).try_into().unwrap(),
+            (size_of::<ArtemisHeader>() - size_of::<u32>())
+                .try_into()
+                .unwrap(),
         ))?;
         file.read_exact(&mut index_data)?;
         hasher.update(&index_data);

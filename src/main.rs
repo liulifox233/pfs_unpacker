@@ -74,35 +74,35 @@ mod test {
     use std::fs;
 
     #[test]
-    fn test_pack() -> Result<(), Box<dyn std::error::Error>> {
+    fn test_pack_v6() -> Result<(), Box<dyn std::error::Error>> {
         let mut cmd = Command::cargo_bin(env!("CARGO_PKG_NAME"))?;
 
         cmd.arg("pack")
             .arg("tests/test_pack")
-            .arg("/tmp/test_pack.pfs");
+            .arg("/tmp/test_pack_v6.pfs");
         cmd.assert().success();
 
-        let expected = fs::read("tests/test_pack.pfs")?;
-        let packed = fs::read("/tmp/test_pack.pfs")?;
+        let expected = fs::read("tests/test_pack_v6.pfs")?;
+        let packed = fs::read("/tmp/test_pack_v6.pfs")?;
 
         assert_eq!(expected, packed);
 
-        fs::remove_file("/tmp/test_pack.pfs")?;
+        fs::remove_file("/tmp/test_pack_v6.pfs")?;
 
         Ok(())
     }
 
     #[test]
-    fn test_unpack() -> Result<(), Box<dyn std::error::Error>> {
+    fn test_unpack_v6() -> Result<(), Box<dyn std::error::Error>> {
         let mut cmd = Command::cargo_bin(env!("CARGO_PKG_NAME"))?;
 
         cmd.arg("unpack")
-            .arg("tests/test_pack.pfs")
-            .arg("/tmp/test_pack");
+            .arg("tests/test_pack_v6.pfs")
+            .arg("/tmp/test_pack_v6");
         cmd.assert().success();
 
         let expected = fs::read_dir("tests/test_pack")?;
-        let unpacked = fs::read_dir("/tmp/test_pack")?;
+        let unpacked = fs::read_dir("/tmp/test_pack_v6")?;
 
         for (expected, unpacked) in expected.zip(unpacked) {
             let expected = expected?;
@@ -111,7 +111,52 @@ mod test {
             assert_eq!(expected.file_name(), unpacked.file_name());
         }
 
-        fs::remove_dir_all("/tmp/test_pack")?;
+        fs::remove_dir_all("/tmp/test_pack_v6")?;
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_pack_v8() -> Result<(), Box<dyn std::error::Error>> {
+        let mut cmd = Command::cargo_bin(env!("CARGO_PKG_NAME"))?;
+
+        cmd.arg("pack")
+            .arg("tests/test_pack")
+            .arg("/tmp/test_pack_v8.pfs")
+            .arg("--version")
+            .arg("8");
+        cmd.assert().success();
+
+        let expected = fs::read("tests/test_pack_v8.pfs")?;
+        let packed = fs::read("/tmp/test_pack_v8.pfs")?;
+
+        assert_eq!(expected, packed);
+
+        fs::remove_file("/tmp/test_pack_v8.pfs")?;
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_unpack_v8() -> Result<(), Box<dyn std::error::Error>> {
+        let mut cmd = Command::cargo_bin(env!("CARGO_PKG_NAME"))?;
+
+        cmd.arg("unpack")
+            .arg("tests/test_pack_v8.pfs")
+            .arg("/tmp/test_pack_v8");
+        cmd.assert().success();
+
+        let expected = fs::read_dir("tests/test_pack")?;
+        let unpacked = fs::read_dir("/tmp/test_pack_v8")?;
+
+        for (expected, unpacked) in expected.zip(unpacked) {
+            let expected = expected?;
+            let unpacked = unpacked?;
+
+            assert_eq!(expected.file_name(), unpacked.file_name());
+        }
+
+        fs::remove_dir_all("/tmp/test_pack_v8")?;
 
         Ok(())
     }
