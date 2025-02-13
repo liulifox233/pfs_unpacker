@@ -1,11 +1,11 @@
 [package]
 name = "pfs_unpacker"
-version = "1.0.0"
+version = "2.0.0"
 edition = "2021"
 license = "GPL-3.0"
 
 [dependencies]
-clap = { version = "4.5.28", features = ["derive"] }
+clap = { version = "4.5.29", features = ["derive"] }
 rayon = "1.10.0"
 sha1 = "0.10.6"
 walkdir = "2.5.0"
