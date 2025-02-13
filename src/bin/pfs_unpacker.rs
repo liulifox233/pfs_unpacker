@@ -1,10 +1,8 @@
-mod pack;
-mod unpack;
-
 use clap::{Parser, Subcommand};
-use unpack::get_info;
-
-use crate::unpack::unpack;
+use pfs_unpacker::{
+    pack::pack,
+    unpack::{get_info, unpack},
+};
 
 #[derive(Parser, Debug, Clone)]
 #[command(version)]
@@ -52,20 +50,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             input_dir,
             output_path,
             version,
-        } => pack::pack(&input_dir, &output_path, version),
+        } => pack(&input_dir, &output_path, version),
     };
     Ok(())
-}
-
-const ARCHIVE_MAGIC: [u8; 2] = [0x70, 0x66];
-const ARCHIVE_MAGIC_SIZE: usize = ARCHIVE_MAGIC.len();
-
-#[repr(packed)]
-struct ArtemisHeader {
-    magic: [u8; ARCHIVE_MAGIC_SIZE],
-    pack_version: u8,
-    index_size: u32,
-    file_count: u32,
 }
 
 #[cfg(test)]

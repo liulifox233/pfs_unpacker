@@ -1,3 +1,4 @@
+use crate::xor_crypt;
 use crate::ArtemisHeader;
 use crate::ARCHIVE_MAGIC;
 use rayon::prelude::*;
@@ -197,14 +198,4 @@ fn process_files(
         });
 
     Ok(())
-}
-
-fn xor_crypt(data: &mut [u8], key: &[u8]) {
-    if key.is_empty() {
-        return;
-    }
-
-    for (i, byte) in data.iter_mut().enumerate() {
-        *byte ^= key[i % key.len()];
-    }
 }

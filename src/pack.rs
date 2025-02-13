@@ -1,4 +1,4 @@
-use crate::ArtemisHeader;
+use crate::{xor_crypt, ArtemisHeader, ARCHIVE_MAGIC};
 use sha1::{Digest, Sha1};
 use std::{
     io::{Read, Write},
@@ -89,7 +89,7 @@ fn pack_v6(input_dir: &str, output_path: &str) {
 
     let mut file = std::fs::File::create(output_path).expect("failed to create output file");
 
-    file.write_all(b"pf").unwrap(); // magic
+    file.write_all(&ARCHIVE_MAGIC).unwrap(); // magic
     file.write_all(b"6").unwrap(); // pack version
     file.write_all(&index_size.to_le_bytes()).unwrap(); // index size
     file.write_all(&(file_count as u32).to_le_bytes()).unwrap(); // file count
@@ -205,7 +205,7 @@ fn pack_v8(input_dir: &str, output_path: &str) {
 
     let mut hasher = Sha1::new();
 
-    file.write_all(b"pf").unwrap(); // magic
+    file.write_all(&ARCHIVE_MAGIC).unwrap(); // magic
     file.write_all(b"8").unwrap(); // pack version
     file.write_all(&index_size.to_le_bytes()).unwrap(); // index size
     hash_and_write(&mut file, &mut hasher, &(file_count as u32).to_le_bytes()); // file count
@@ -264,16 +264,6 @@ fn pack_v8(input_dir: &str, output_path: &str) {
             xor_crypt(&mut buf[..read], &xor_key);
             file.write_all(&buf[..read]).unwrap();
         }
-    }
-}
-
-fn xor_crypt(data: &mut [u8], key: &[u8]) {
-    if key.is_empty() {
-        return;
-    }
-
-    for (i, byte) in data.iter_mut().enumerate() {
-        *byte ^= key[i % key.len()];
     }
 }
 

@@ -8,9 +8,9 @@ features:
 
 - pack dir to .pfs archive
 
-  - support v6
+  - support v6, v8
 
-- support unix ( linux / macos )
+- support unix ( Linux / MacOS ) and Windows
 
 ---
 
