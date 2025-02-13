@@ -17,16 +17,13 @@ jobs:
       - name: Run Clippy
         run: cargo clippy --all-targets --all-features
 
-      - name: Build
-        run: cargo build
-
       - name: Test
         run: cargo test
 
   build_martix:
     strategy:
       matrix:
-        os: [macos-latest, ubuntu-latest]
+        os: [macos-latest, ubuntu-latest, windows-latest]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
@@ -37,8 +34,16 @@ jobs:
       - name: Build
         run: cargo build --release
 
-      - name: Upload
+      - name: Upload ( Unix )
+        if: runner.os != 'Windows'
         uses: actions/upload-artifact@v4.4.3
         with:
           name: pfs_unpacker-${{ runner.os }}-${{ runner.arch }}
           path: target/release/pfs_unpacker
+
+      - name: Upload ( Windows )
+        if: runner.os == 'Windows'
+        uses: actions/upload-artifact@v4.4.3
+        with:
+          name: pfs_unpacker-${{ runner.os }}-${{ runner.arch }}
+          path: target/release/pfs_unpacker.exe

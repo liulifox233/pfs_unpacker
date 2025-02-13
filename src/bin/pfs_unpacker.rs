@@ -57,12 +57,13 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 #[cfg(test)]
 mod test {
-    use assert_cmd::Command;
+    use assert_cmd::assert::OutputAssertExt;
     use std::fs;
 
     #[test]
     fn test_pack_v6() -> Result<(), Box<dyn std::error::Error>> {
-        let mut cmd = Command::cargo_bin(env!("CARGO_PKG_NAME"))?;
+        let bin_under_test = escargot::CargoBuild::new().current_target().run().unwrap();
+        let mut cmd = bin_under_test.command();
 
         cmd.arg("pack")
             .arg("tests/test_pack")
@@ -81,7 +82,8 @@ mod test {
 
     #[test]
     fn test_unpack_v6() -> Result<(), Box<dyn std::error::Error>> {
-        let mut cmd = Command::cargo_bin(env!("CARGO_PKG_NAME"))?;
+        let bin_under_test = escargot::CargoBuild::new().current_target().run().unwrap();
+        let mut cmd = bin_under_test.command();
 
         cmd.arg("unpack")
             .arg("tests/test_pack_v6.pfs")
@@ -105,7 +107,8 @@ mod test {
 
     #[test]
     fn test_pack_v8() -> Result<(), Box<dyn std::error::Error>> {
-        let mut cmd = Command::cargo_bin(env!("CARGO_PKG_NAME"))?;
+        let bin_under_test = escargot::CargoBuild::new().current_target().run().unwrap();
+        let mut cmd = bin_under_test.command();
 
         cmd.arg("pack")
             .arg("tests/test_pack")
@@ -126,7 +129,8 @@ mod test {
 
     #[test]
     fn test_unpack_v8() -> Result<(), Box<dyn std::error::Error>> {
-        let mut cmd = Command::cargo_bin(env!("CARGO_PKG_NAME"))?;
+        let bin_under_test = escargot::CargoBuild::new().current_target().run().unwrap();
+        let mut cmd = bin_under_test.command();
 
         cmd.arg("unpack")
             .arg("tests/test_pack_v8.pfs")
